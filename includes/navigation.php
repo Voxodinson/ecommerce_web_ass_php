@@ -22,23 +22,6 @@
                     </li>
                     <li class="has-dropdown <?= basename($_SERVER['PHP_SELF']) == 'men.php' ? 'active' : '' ?>">
                         <a href="men.php">Men</a>
-                        <ul class="dropdown">
-                            <li class="<?= basename($_SERVER['PHP_SELF']) == 'product-detail.php' ? 'active' : '' ?>">
-                                <a href="product-detail.php">Product Detail</a>
-                            </li>
-                            <li class="<?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
-                                <a href="cart.php">Shopping Cart</a>
-                            </li>
-                            <li class="<?= basename($_SERVER['PHP_SELF']) == 'checkout.php' ? 'active' : '' ?>">
-                                <a href="checkout.php">Checkout</a>
-                            </li>
-                            <li class="<?= basename($_SERVER['PHP_SELF']) == 'order-complete.php' ? 'active' : '' ?>">
-                                <a href="order-complete.php">Order Complete</a>
-                            </li>
-                            <li class="<?= basename($_SERVER['PHP_SELF']) == 'add-to-wishlist.php' ? 'active' : '' ?>">
-                                <a href="add-to-wishlist.php">Wishlist</a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="<?= basename($_SERVER['PHP_SELF']) == 'women.php' ? 'active' : '' ?>">
                         <a href="women.php">Women</a>
