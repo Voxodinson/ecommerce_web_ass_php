@@ -2,13 +2,27 @@
 <html>
 <?php include('link_import.php')?>
 <?php
-	include_once('services/config.php');
-	$query = "SELECT * FROM products_tb";
-	$result = mysqli_query($con, $query);
+include_once('services/config.php');
+if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+}
+
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 10;
+$offset = ($page - 1) * $limit;
+
+$totalQuery = "SELECT COUNT(*) as total FROM products_tb";
+$totalResult = mysqli_query($con, $totalQuery);
+$totalRow = mysqli_fetch_assoc($totalResult);
+$totalProducts = $totalRow['total'];
+$totalPages = ceil($totalProducts / $limit);
+
+$query = "SELECT * FROM products_tb LIMIT $limit OFFSET $offset";
+$result = mysqli_query($con, $query);
 ?>
 <body>	
 	<div class="colorlib-loader"></div>
-	<div id="page">
+	<div id="page" class=" justify-content-center">
 		<?php include('includes/navigation.php')?>
 		<div class="breadcrumbs">
 			<div class="container">
@@ -65,161 +79,66 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="colorlib-product">
+		<div class="colorlib-featured">
 			<div class="container">
 				<div class="row">
-					<div class="col-lg-3 col-xl-3">
-						<div class="row">
-							<div class="col-sm-12">
-								<div class="side border mb-1">
-									<h3>Brand</h3>
-									<ul>
-										<li><a href="#">Nike</a></li>
-										<li><a href="#">Adidas</a></li>
-										<li><a href="#">Merrel</a></li>
-										<li><a href="#">Gucci</a></li>
-										<li><a href="#">Skechers</a></li>
-									</ul>
-								</div>
-							</div>
-							<div class="col-sm-12">
-								<div class="side border mb-1">
-									<h3>Size/Width</h3>
-									<div class="block-26 mb-2">
-										<h4>Size</h4>
-					               <ul>
-					                  <li><a href="#">7</a></li>
-					                  <li><a href="#">7.5</a></li>
-					                  <li><a href="#">8</a></li>
-					                  <li><a href="#">8.5</a></li>
-					                  <li><a href="#">9</a></li>
-					                  <li><a href="#">9.5</a></li>
-					                  <li><a href="#">10</a></li>
-					                  <li><a href="#">10.5</a></li>
-					                  <li><a href="#">11</a></li>
-					                  <li><a href="#">11.5</a></li>
-					                  <li><a href="#">12</a></li>
-					                  <li><a href="#">12.5</a></li>
-					                  <li><a href="#">13</a></li>
-					                  <li><a href="#">13.5</a></li>
-					                  <li><a href="#">14</a></li>
-					               </ul>
-					            </div>
-					            <div class="block-26">
-										<h4>Width</h4>
-					               <ul>
-					                  <li><a href="#">M</a></li>
-					                  <li><a href="#">W</a></li>
-					               </ul>
-					            </div>
-								</div>
-							</div>
-							<div class="col-sm-12">
-								<div class="side border mb-1">
-									<h3>Style</h3>
-									<ul>
-										<li><a href="#">Slip Ons</a></li>
-										<li><a href="#">Boots</a></li>
-										<li><a href="#">Sandals</a></li>
-										<li><a href="#">Lace Ups</a></li>
-										<li><a href="#">Oxfords</a></li>
-									</ul>
-								</div>
-							</div>
-							<div class="col-sm-12">
-								<div class="side border mb-1">
-									<h3>Colors</h3>
-									<ul>
-										<li><a href="#">Black</a></li>
-										<li><a href="#">White</a></li>
-										<li><a href="#">Blue</a></li>
-										<li><a href="#">Red</a></li>
-										<li><a href="#">Green</a></li>
-										<li><a href="#">Grey</a></li>
-										<li><a href="#">Orange</a></li>
-										<li><a href="#">Cream</a></li>
-										<li><a href="#">Brown</a></li>
-									</ul>
-								</div>
-							</div>
-							<div class="col-sm-12">
-								<div class="side border mb-1">
-									<h3>Material</h3>
-									<ul>
-										<li><a href="#">Leather</a></li>
-										<li><a href="#">Suede</a></li>
-									</ul>
-								</div>
-							</div>
-							<div class="col-sm-12">
-								<div class="side border mb-1">
-									<h3>Technologies</h3>
-									<ul>
-										<li><a href="#">BioBevel</a></li>
-										<li><a href="#">Groove</a></li>
-										<li><a href="#">FlexBevel</a></li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-9 col-xl-9">
-						<div class="row row-pb-md">
-							<?php
-								$bestSaleCount = 0;
-
-								if ($result->num_rows > 0) {
-									while ($row = $result->fetch_assoc()) {
-										if ($row['product_for'] !== 'men') {
-											continue;
-										}
-
-										$images = json_decode($row['images'], true);
-										$firstImage = $images[0];
-
-								?>
-									<div class="col-md-4 col-lg-4 col-xl-4 mb-4">
-										<div class="card h-100 border shadow-sm">
-											<a href="#" class="prod-img">
-												<img src="<?php echo htmlspecialchars($firstImage); ?>" class="card-img-top img-fluid" alt="<?php echo htmlspecialchars($row['name']); ?>">
-											</a>
-											<div class="card-body text-center">
-												<h5 class="card-title">
-													<a href="#" class="text-decoration-none text-dark"><?php echo htmlspecialchars($row['name']); ?></a>
-												</h5>
-												<span class="price text-danger fw-bold">$<?php echo number_format($row['price'], 2); ?></span>
-											</div>
-										</div>
-									</div>
-
-								<?php
-									}
-								} else {
-									echo "<p class='text-center'>No products found.</p>";
-								}
-							?>
-						</div>
-						<div class="row">
-							<div class="col-md-12 text-center">
-								<div class="block-27">
-				               <ul>
-					               <li><a href="#"><i class="ion-ios-arrow-back"></i></a></li>
-				                  <li class="active"><span>1</span></li>
-				                  <li><a href="#">2</a></li>
-				                  <li><a href="#">3</a></li>
-				                  <li><a href="#">4</a></li>
-				                  <li><a href="#">5</a></li>
-				                  <li><a href="#"><i class="ion-ios-arrow-forward"></i></a></li>
-				               </ul>
-				            </div>
-							</div>
-						</div>
+					<div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
+						<h2>View All Products</h2>
 					</div>
 				</div>
-			</div>
-		</div>
+				<div class="row">
+					<div class="row row-pb-md" id="products">
+						<?php
+						if ($result->num_rows > 0) {
+							while ($row = $result->fetch_assoc()) {
+								$images = json_decode($row['images'], true);
+								$firstImage = $images[0];
+						?>
+								<div class="col-md-3 col-lg-3​​ col-xl-3 mb-5">
+									<div class="card h-100 border shadow-sm">
+										<a href="#" class="prod-img">
+											<img src="<?php echo htmlspecialchars($firstImage); ?>" class="card-img-top img-fluid" alt="<?php echo htmlspecialchars($row['name']); ?>">
+										</a>
+										<div class="card-body text-center">
+											<h5 class="card-title">
+												<a href="#" class="text-decoration-none text-dark"><?php echo htmlspecialchars($row['name']); ?></a>
+											</h5>
+											<span class="price text-danger fw-bold">$<?php echo number_format($row['price'], 2); ?></span>
+										</div>
+									</div>
+								</div>
+						<?php
+							}
+						} else {
+							echo "<p class='text-center w-100'>No products found.</p>";
+						}
+						?>
+					</div>
+					<div class="row w-100">
+						<div class="col-md-12 text-center">
+							<div class="block-27">
+								<ul>
+									<?php if ($page > 1): ?>
+										<li><a href="?page=<?php echo $page - 1; ?>"><i class="ion-ios-arrow-back"></i></a></li>
+									<?php endif; ?>
 
+									<?php for ($i = 1; $i <= $totalPages; $i++): ?>
+										<li class="<?php echo ($i == $page) ? 'active' : ''; ?>">
+											<a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+										</li>
+									<?php endfor; ?>
+
+									<?php if ($page < $totalPages): ?>
+										<li><a href="?page=<?php echo $page + 1; ?>"><i class="ion-ios-arrow-forward"></i></a></li>
+									<?php endif; ?>
+								</ul>
+							</div>
+						</div>
+					</div> 
+				</div>
+			</div>
+		</div>		
+			
 		<div class="colorlib-partner">
 			<div class="container">
 				<div class="row">
