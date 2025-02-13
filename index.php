@@ -111,23 +111,36 @@
 				</div>
 				<div class="row row-pb-md">
 					<?php
+						$bestSaleCount = 0;
+
 						if ($result->num_rows > 0) {
 							while ($row = $result->fetch_assoc()) {
+								if ($row['status'] !== 'best sale') {
+									continue;
+								}
+
 								$images = json_decode($row['images'], true);
-								$firstImage = $images[0] ?? 'images/default.jpg'; // Fallback image
+								$firstImage = $images[0];
+
 						?>
 								<div class="col-md-6 col-lg-4 col-xl-3 mb-4">
-									<div class="card border shadow-sm">
+									<div class="card h-100 border shadow-sm">
 										<a href="#" class="prod-img">
 											<img src="<?php echo htmlspecialchars($firstImage); ?>" class="card-img-top img-fluid" alt="<?php echo htmlspecialchars($row['name']); ?>">
 										</a>
 										<div class="card-body text-center">
-											<h5 class="card-title"><a href="#" class="text-decoration-none text-dark"><?php echo htmlspecialchars($row['name']); ?></a></h5>
-											<span class="price text-danger fw-bold">$<?php echo number_format($row['price'], 2); ?></span>
+											<h5 class="card-title">
+												<a href="#" class="text-decoration-none text-dark"><?php echo htmlspecialchars($row['name']); ?></a>
+											</h5>
+											<span class="price text-danger fw-bosld">$<?php echo number_format($row['price'], 2); ?></span>
 										</div>
 									</div>
 								</div>
 						<?php
+								$bestSaleCount++;
+								if ($bestSaleCount >= 4) {
+									break; // Stop after displaying 4 products
+								}
 							}
 						} else {
 							echo "<p class='text-center'>No products found.</p>";
