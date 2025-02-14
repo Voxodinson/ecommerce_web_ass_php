@@ -84,7 +84,7 @@
 				<div class="row">
 					<div class="col-sm-6 text-center">
 						<div class="featured">
-							<a href="women.php" class="featured-img" style="background-image: url(images/men.jpg);"></a>
+							<a href="men.php" class="featured-img" style="background-image: url(images/men.jpg);"></a>
 							<div class="desc">
 								<h2><a href="men.php">Shop Men's Collection</a></h2>
 							</div>
@@ -125,7 +125,7 @@
 						?>
 								<div class="col-md-6 col-lg-4 col-xl-3 mb-4">
 									<div class="card h-100 border shadow-sm">
-										<a href="#" class="prod-img">
+										<a href="product-detail.php?id=<?php echo $row['id']; ?>" class="prod-img">
 											<img src="<?php echo htmlspecialchars($firstImage); ?>" class="card-img-top img-fluid" alt="<?php echo htmlspecialchars($row['name']); ?>">
 										</a>
 										<div class="card-body text-center">
@@ -149,7 +149,7 @@
 				</div>
 				<div class="row">
 					<div class="col-md-12 text-center">
-						<p><a href="" class="btn btn-primary btn-lg">Shop All Products</a></p>
+						<p><a href="men.php" class="btn btn-primary btn-lg">Shop All Products</a></p>
 					</div>
 				</div>
 			</div>

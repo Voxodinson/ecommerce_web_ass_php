@@ -5,7 +5,6 @@ session_start();
 
 $product_id = isset($_GET['id']) ? $_GET['id'] : null;
 
-// Initialize variables for product data
 $product_name = '';
 $product_price = '';
 $product_description = '';
@@ -13,23 +12,23 @@ $product_images = [];
 $product_sizes = [];
 $product_widths = [];
 
-// Handle cart logic
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
     $product_id = $_POST['product_id'];
     $quantity = $_POST['quantity'];
     $size = $_POST['size'];
 
-    // Check if size is selected
     if (empty($size)) {
-        echo "<p>Please select a size before adding to cart.</p>";
+        echo "
+            <div class='w-100 h-100 d-flex justify-content-center align-items-center flex-column text-center'>
+                <p class='fw-bold text-danger'>Please select a size before adding to cart.</p>
+                <button onclick='history.back()' class='btn btn-primary mt-3'>Go Back</button>
+            </div>
+        ";
         exit();
     }
-
-    // Fetch product details from the database
-    $product_details = getProductDetails($product_id);  // Function to get product details by ID
+    $product_details = getProductDetails($product_id);
     
     if (!$product_details) {
-        // Product not found
         echo "<p>Product not found.</p>";
         exit();
     }
@@ -46,14 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
     $exists = false;
     foreach ($_SESSION['cart'] as &$cart_item) {
         if ($cart_item['product_id'] == $product_id && $cart_item['size'] == $size) {
-            $cart_item['quantity'] += $quantity;  // Update quantity if product exists
+            $cart_item['quantity'] += $quantity;
             $exists = true;
             break;
         }
     }
 
     if (!$exists) {
-        // Add new product to the cart with the first image and additional details
         $cart_item = [
             'product_id' => $product_id,
             'quantity' => $quantity,
@@ -61,12 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
             'name' => $product_name,
             'price' => $product_price,
             'image' => $product_image,
-            'details' => $product_description// Store only the first image
+            'details' => $product_description
         ];
         $_SESSION['cart'][] = $cart_item;
     }
 
-    header('Location: ' . $_SERVER['REQUEST_URI']);  // Reload page to avoid resubmission
+    header('Location: ' . $_SERVER['REQUEST_URI']);
     exit();
 }
 
@@ -227,7 +225,7 @@ function getProductDetails($product_id) {
                     e.preventDefault();
                     quantity = parseInt($('#quantity').val());
                     $('#quantity').val(quantity + 1);
-                    $('#quantity_input').val(quantity + 1);  // Update hidden input
+                    $('#quantity_input').val(quantity + 1);
                 });
 
                 $('.quantity-left-minus').click(function(e){
@@ -235,7 +233,7 @@ function getProductDetails($product_id) {
                     quantity = parseInt($('#quantity').val());
                     if (quantity > 1) {
                         $('#quantity').val(quantity - 1);
-                        $('#quantity_input').val(quantity - 1);  // Update hidden input
+                        $('#quantity_input').val(quantity - 1);
                     }
                 });
             });
@@ -244,8 +242,8 @@ function getProductDetails($product_id) {
                 $('.size-item').click(function() {
                     $('.size-item').removeClass('active');
                     $(this).addClass('active');
-                    var selectedSize = $(this).text();  // Get the size text
-                    $('#size_input').val(selectedSize);  // Set it to the hidden input field
+                    var selectedSize = $(this).text();  
+                    $('#size_input').val(selectedSize);  
                 });
             });
         </script>
