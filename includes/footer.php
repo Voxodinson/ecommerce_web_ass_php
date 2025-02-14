@@ -17,13 +17,7 @@
 						<h4>Customer Care</h4>
 						<p>
 							<ul class="colorlib-footer-links">
-								<li><a href="#">Contact</a></li>
-								<li><a href="#">Returns/Exchange</a></li>
-								<li><a href="#">Gift Voucher</a></li>
-								<li><a href="#">Wishlist</a></li>
-								<li><a href="#">Special</a></li>
-								<li><a href="#">Customer Services</a></li>
-								<li><a href="#">Site maps</a></li>
+								<li><a href="contact.php">Contact</a></li>
 							</ul>
 						</p>
 					</div>
@@ -31,31 +25,17 @@
 						<h4>Information</h4>
 						<p>
 							<ul class="colorlib-footer-links">
-								<li><a href="#">About us</a></li>
-								<li><a href="#">Delivery Information</a></li>
-								<li><a href="#">Privacy Policy</a></li>
-								<li><a href="#">Support</a></li>
-								<li><a href="#">Order Tracking</a></li>
+								<li><a href="about.php">About us</a></li>
 							</ul>
 						</p>
 					</div>
-
-					<div class="col footer-col">
-						<h4>News</h4>
-						<ul class="colorlib-footer-links">
-							<li><a href="blog.html">Blog</a></li>
-							<li><a href="#">Press</a></li>
-							<li><a href="#">Exhibitions</a></li>
-						</ul>
-					</div>
-
 					<div class="col footer-col">
 						<h4>Contact Information</h4>
 						<ul class="colorlib-footer-links">
-							<li>291 South 21th Street, <br> Suite 721 New York NY 10016</li>
-							<li><a href="tel://1234567920">+ 1235 2355 98</a></li>
-							<li><a href="mailto:info@yoursite.com">info@yoursite.com</a></li>
-							<li><a href="#">yoursite.com</a></li>
+							<li>664, Boeng Salang, Toul kork, Phnom Penh, Cambodia</li>
+							<li><a href="tel://1234567920">+855 67961719</a></li>
+							<li><a href="mailto:voxodinson@gmail.com">voxodinson@gmail.com</a></li>
+							<li><a href="https://sneakers.com" _target="blank">Sneakers.com</a></li>
 						</ul>
 					</div>
 				</div>

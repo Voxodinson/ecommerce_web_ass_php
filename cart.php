@@ -10,21 +10,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id']) && isset
     $product_id = $_POST['product_id'];
     $quantity = $_POST['quantity'];
 
-    // Loop through the cart and update the quantity if the product exists
+    // Update quantity in the cart
     foreach ($_SESSION['cart'] as &$item) {
         if ($item['product_id'] == $product_id) {
-            $item['quantity'] = $quantity;  // Update the quantity
+            $item['quantity'] = $quantity;  
             break;
         }
     }
 
-    // Recalculate total price after updating quantity
-    $total = 0;
-    foreach ($_SESSION['cart'] as $item) {
-        $total += $item['price'] * $item['quantity'];
-    }
-
-    header('Location: cart.php');  // Redirect to avoid resubmission on refresh
+    header('Location: cart.php');
     exit();
 }
 
@@ -32,14 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id']) && isset
 if (isset($_GET['id'])) {
     $product_id = $_GET['id'];
 
-    // Loop through the cart and remove the item if it exists
-    foreach ($_SESSION['cart'] as $key => $item) {
+    foreach ($_SESSION['cart'] as $key => &$item) {
         if ($item['product_id'] == $product_id) {
-            unset($_SESSION['cart'][$key]);
+            if ($item['quantity'] > 1) {
+                $item['quantity']--;  // Reduce quantity by 1
+            } else {
+                unset($_SESSION['cart'][$key]);  // Remove item if quantity is 1
+            }
+            break;  // Stop after modifying one item
         }
     }
-    $_SESSION['cart'] = array_values($_SESSION['cart']);  // Re-index the array after removal
-    header('Location: cart.php');  // Redirect to prevent resubmission on refresh
+
+    $_SESSION['cart'] = array_values($_SESSION['cart']);  
+    header('Location: cart.php');  
     exit();
 }
 
@@ -48,7 +47,6 @@ $total = 0;
 foreach ($_SESSION['cart'] as $item) {
     $total += $item['price'] * $item['quantity'];
 }
-
 ?>
 <body>
     <div class="colorlib-loader"></div>

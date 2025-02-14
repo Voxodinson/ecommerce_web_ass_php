@@ -3,9 +3,6 @@
 <?php include('link_import.php')?>
 <?php
 include_once('services/config.php');
-if ($con->connect_error) {
-    die("Connection failed: " . $con->connect_error);
-}
 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 10;
@@ -96,7 +93,7 @@ $result = mysqli_query($con, $query);
 						?>
 								<div class="col-md-3 col-lg-3​​ col-xl-3 mb-5">
 									<div class="card h-100 border shadow-sm">
-										<a href="#" class="prod-img">
+										<a href="product-detail.php?id=<?php echo $row['id']; ?>" class="prod-img">
 											<img src="<?php echo htmlspecialchars($firstImage); ?>" class="card-img-top img-fluid" alt="<?php echo htmlspecialchars($row['name']); ?>">
 										</a>
 										<div class="card-body text-center">
