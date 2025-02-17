@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+// Sample cart structure
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+function getCartTotal() {
+    return isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0;
+}
+
+$totalItems = getCartTotal();
+?>
 <nav class="colorlib-nav" role="navigation">
     <div class="top-menu">
         <div class="container">
@@ -35,7 +49,7 @@
                             <a href="contact.php">Contact</a>
                         </li>
                         <li class="cart <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
-                            <a href="cart.php"><i class="icon-shopping-cart"></i> Cart [<?= $cart_count ?>]</a>
+                            <a href="cart.php"><i class="icon-shopping-cart"></i> Cart [<?= $totalItems ?>]</a>
                         </li>
                     </ul>
                 </div>
