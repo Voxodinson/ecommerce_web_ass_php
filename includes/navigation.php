@@ -1,4 +1,5 @@
 <?php
+include('./link_import.php');
 session_start();
 
 // Sample cart structure
@@ -6,29 +7,54 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-function getCartTotal() {
-    return isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0;
-}
-
-$totalItems = getCartTotal();
+$totalUniqueItems = count($_SESSION['cart']);
 ?>
 <nav class="colorlib-nav" role="navigation">
     <div class="top-menu">
         <div class="container">
-            <div class="row">
-                <div class="col-sm-7 col-md-9">
+            <div class="row d-flex">
+                <div class="col-sm-4 col-md-6">
                     <div id="colorlib-logo"><a href="index.php">Sneakers</a></div>
                 </div>
-                <div class="col-sm-5 col-md-3">
-                    <form action="javascript:void(0);" class="search-wrap">
-                        <div class="form-group" data-bs-toggle="modal" data-bs-target="#searchModal">
-                            <input type="search" class="form-control search" placeholder="Search">
-                            <button class="btn btn-primary submit-search text-center" type="button" >
+                <div class="d-flex col-sm-4 col-md-6">
+                    <form action="javascript:void(0);" class="search-wrap d-flex w-100">
+                        <div class="form-group flex-grow-1" data-bs-toggle="modal" data-bs-target="#searchModal">
+                            <input type="search" class="form-control search" style="width: 400px;" placeholder="Search">
+                            <button class="btn btn-primary submit-search text-center" type="button">
                                 <i class="icon-search"></i>
                             </button>
                         </div>
                     </form>
+
+                    <div class="ms-3">
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <?php
+                                if (isset($_SESSION['username'])) {
+                                    // Show the username if logged in
+                                    echo "Hello, " . htmlspecialchars($_SESSION['username']);
+                                } else {
+                                    // Show "Login" if not logged in
+                                    echo "Login / Register";
+                                }
+                                ?>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                <?php
+                                if (isset($_SESSION['username'])) {
+                                    // Display logout option if the user is logged in
+                                    echo '<li><a class="dropdown-item roboto-font" href="logout.php">Logout</a></li>';
+                                } else {
+                                    // Display login option if the user is not logged in
+                                    echo '<li><a class="dropdown-item" href="login.php">Login</a></li>';
+                                    echo '<li><a class="dropdown-item" href="signup.php">Register New Account</a></li>';
+                                }
+                                ?>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
+
             </div>
             <div class="row">
                 <div class="col-sm-12 text-left menu-1">
@@ -48,8 +74,10 @@ $totalItems = getCartTotal();
                         <li class="<?= basename($_SERVER['PHP_SELF']) == 'contact.php' ? 'active' : '' ?>">
                             <a href="contact.php">Contact</a>
                         </li>
+                        
+                        <!-- Cart -->
                         <li class="cart <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
-                            <a href="cart.php"><i class="icon-shopping-cart"></i> Cart [<?= $totalItems ?>]</a>
+                            <a href="cart.php"><i class="icon-shopping-cart"></i> Cart [<?= $totalUniqueItems ?>]</a>
                         </li>
                     </ul>
                 </div>

@@ -43,13 +43,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
     }
 
     $exists = false;
-    foreach ($_SESSION['cart'] as &$cart_item) {
+    foreach ($_SESSION['cart'] as $index => $cart_item) {
         if ($cart_item['product_id'] == $product_id && $cart_item['size'] == $size) {
-            $cart_item['quantity'] += $quantity;
+            $_SESSION['cart'][$index]['quantity'] += $quantity;
             $exists = true;
             break;
         }
     }
+    
 
     if (!$exists) {
         $cart_item = [
