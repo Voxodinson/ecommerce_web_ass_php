@@ -34,9 +34,9 @@ if (isset($_GET['query'])) {
             $productName = htmlspecialchars($row['name']);
             $productId = $row['id'];
 
-            echo "<li class='list-group-item pe-auto mt-1 table-hover' style='border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center;'>
-                    <a href='product-detail.php?id=$productId' class='prod-link' style='text-decoration: none; display: flex; align-items: center; width: 100%;'>
-                            <p class='card-title' style='font-size: 0.8rem; color: #333;'>$productName</p>
+            echo "<li>
+                    <a href='product-detail.php?id=$productId' class='w-100 h-100 bg-danger'>
+                        <p class='' style='font-size: 0.8rem; color: #333;'>$productName</p>
                     </a>
                   </li>";
         }

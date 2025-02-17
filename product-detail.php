@@ -203,7 +203,7 @@ function getProductDetails($product_id) {
                                 <div class="row">
                                     <div class="col-sm-12 text-center">
                                         <p class="addtocart">
-                                            <button type="submit" class="btn btn-primary btn-addtocart">
+                                            <button type="submit" class="btn btn-primary btn-addtocart d-flex">
                                                 <i class="icon-shopping-cart bg-[#17a2b8]"></i> Add to Cart
                                             </button>
                                         </p>

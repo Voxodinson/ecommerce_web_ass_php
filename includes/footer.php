@@ -34,7 +34,7 @@
 						<ul class="colorlib-footer-links">
 							<li>664, Boeng Salang, Toul kork, Phnom Penh, Cambodia</li>
 							<li><a href="tel://1234567920">+855 67961719</a></li>
-							<li><a href="mailto:voxodinson@gmail.com">voxodinson@gmail.com</a></li>
+							<li><a href="mailto:voxodinson@gmail.com">info.sneakers.com</a></li>
 							<li><a href="https://sneakers.com" _target="blank">Sneakers.com</a></li>
 						</ul>
 					</div>
