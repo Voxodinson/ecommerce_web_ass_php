@@ -1,64 +1,86 @@
 <?php
-// Database connection
+session_start();
+
+// Ensure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo "<script>alert('Please LOGIN to proceed with your order.'); window.location.href='login.php';</script>";
+    exit();
+}
+
 $host = "localhost";
 $username = "root";
 $password = "";
 $database = "ecom_web_assignment";
 
 $con = new mysqli($host, $username, $password, $database);
-
 if ($con->connect_error) {
     die("Connection failed: " . $con->connect_error);
 }
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $country = $_POST['people'];
-    $fname = $_POST['fname'];
-    $lname = $_POST['lname'];
-    $address = $_POST['address'];
-    $address2 = $_POST['address2'] ?? '';
-    $towncity = $_POST['towncity'];
-    $stateprovince = $_POST['stateprovince'] ?? '';
-    $zippostalcode = $_POST['zippostalcode'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $payment_method = $_POST['optradio'];
+    $user_id = $_SESSION['user_id'];
+    $country = mysqli_real_escape_string($con, $_POST['people']);
+    $fname = mysqli_real_escape_string($con, $_POST['fname']);
+    $lname = mysqli_real_escape_string($con, $_POST['lname']);
+    $address = mysqli_real_escape_string($con, $_POST['address']);
+    $address2 = mysqli_real_escape_string($con, $_POST['address2'] ?? '');
+    $towncity = mysqli_real_escape_string($con, $_POST['towncity']);
+    $stateprovince = mysqli_real_escape_string($con, $_POST['stateprovince'] ?? '');
+    $zippostalcode = mysqli_real_escape_string($con, $_POST['zippostalcode']);
+    $email = mysqli_real_escape_string($con, $_POST['email']);
+    $phone = mysqli_real_escape_string($con, $_POST['phone']);
+    $payment_method = mysqli_real_escape_string($con, $_POST['optradio']);
 
-    // Step 1: Insert checkout information into the checkout_info table
-    $sql = "INSERT INTO checkout_info (country, fname, lname, address, address2, towncity, stateprovince, zippostalcode, email, phone, payment_method) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
+    $sql = "INSERT INTO checkout_info (user_id, country, fname, lname, address, address2, towncity, stateprovince, zippostalcode, email, phone, payment_method) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
     $stmt = $con->prepare($sql);
-    $stmt->bind_param("sssssssssss", $country, $fname, $lname, $address, $address2, $towncity, $stateprovince, $zippostalcode, $email, $phone, $payment_method);
-    
-    if ($stmt->execute()) {
-        $checkout_info_id = $stmt->insert_id; // Get the inserted checkout info ID
+    $stmt->bind_param("isssssssssss", $user_id, $country, $fname, $lname, $address, $address2, $towncity, $stateprovince, $zippostalcode, $email, $phone, $payment_method);
 
-        // Step 2: Insert cart items into the order_history table
-        session_start(); // Start the session
+    if ($stmt->execute()) {
+        $checkout_info_id = $stmt->insert_id;
+        
         $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
         if (!empty($cartItems)) {
-            $order_date = date('Y-m-d H:i:s'); // Get current timestamp
+            $order_date = date('Y-m-d H:i:s');
             foreach ($cartItems as $item) {
-                $product_name = $item['name'];
+                $item_id = $item['product_id'];  // Assuming each item has an 'id' field
+                $product_name = mysqli_real_escape_string($con, $item['name']);
                 $price = $item['price'];
                 $quantity = $item['quantity'];
                 $subtotal = $price * $quantity;
-
-                // Insert each cart item into the order_history table
-                $order_sql = "INSERT INTO order_history (checkout_info_id, product_name, price, quantity, subtotal, order_date) 
-                              VALUES (?, ?, ?, ?, ?, ?)";
+                $image = mysqli_real_escape_string($con, $item['image']); // Assuming image is a string URL/path
                 
+                
+                // Corrected SQL with 8 columns (including image)
+                $order_sql = "INSERT INTO order_history (checkout_info_id, item_id, product_name, price, quantity, subtotal, order_date, image) 
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
                 $order_stmt = $con->prepare($order_sql);
-                $order_stmt->bind_param("issdss", $checkout_info_id, $product_name, $price, $quantity, $subtotal, $order_date);
-                $order_stmt->execute();
+
+                if ($order_stmt === false) {
+                    echo "Error preparing statement: " . $con->error;
+                    exit();
+                }
+
+                // Correct bind_param with 8 values (including image)
+                $order_stmt->bind_param("iisdddss", $checkout_info_id, $item_id, $product_name, $price, $quantity, $subtotal, $order_date, $image);
+
+                if ($order_stmt->execute()) {
+                    echo "Inserted order history for product: $product_name\n";
+                } else {
+                    echo "Error executing order insert: " . $order_stmt->error . "\n";
+                }
                 $order_stmt->close();
             }
+            
+        } else {
+            echo "<script>alert('Your cart is empty. Please add items to the cart before checking out.'); window.location.href='cart.php';</script>";
+            exit();
         }
 
-        echo "<script>alert('Order placed successfully!'); window.location.href='order-complete.php';</script>";
+        echo "<script>window.location.href='order-complete.php'</script>";
     } else {
         echo "<script>alert('Error placing order. Please try again.');</script>";
     }
@@ -68,6 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $con->close();
 ?>
+
 
 <!DOCTYPE HTML>
 <html lang="en">
@@ -149,32 +172,30 @@ $con->close();
                         <div class="cart-detail">
                             <h2>Cart Total</h2>
                             <?php
-								session_start(); // Start the session
+                                // Ensure cart exists
+                                $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
-								// Check if cart exists
-								$cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+                                $subtotal = 0;
+                            ?>
 
-								$subtotal = 0;
-								?>
+                            <ul id="cart-items">
+                                <?php if (!empty($cartItems)): ?>
+                                    <?php foreach ($cartItems as $item): ?>
+                                        <?php $subtotal += $item['price'] * $item['quantity']; ?>
+                                        <li>
+                                            <span><?php echo htmlspecialchars($item['name']); ?> (x<?php echo $item['quantity']; ?>)</span> 
+                                            <span>$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li><span>Your cart is empty</span></li>
+                                <?php endif; ?>
+                            </ul>
 
-								<ul id="cart-items">
-									<?php if (!empty($cartItems)): ?>
-										<?php foreach ($cartItems as $item): ?>
-											<?php $subtotal += $item['price'] * $item['quantity']; ?>
-											<li>
-												<span><?php echo htmlspecialchars($item['name']); ?> (x<?php echo $item['quantity']; ?>)</span> 
-												<span>$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
-											</li>
-										<?php endforeach; ?>
-									<?php else: ?>
-										<li><span>Your cart is empty</span></li>
-									<?php endif; ?>
-								</ul>
-
-								<ul id="cart-items" class="mt-3">
-									<li><span>Subtotal</span> <span id="subtotal">$<?php echo number_format($subtotal, 2); ?></span></li>
-									<li><span>Order Total</span> <span id="order-total">$<?php echo number_format($subtotal, 2); ?></span></li>
-								</ul>
+                            <ul id="cart-items" class="mt-3">
+                                <li><span>Subtotal</span> <span id="subtotal">$<?php echo number_format($subtotal, 2); ?></span></li>
+                                <li><span>Order Total</span> <span id="order-total">$<?php echo number_format($subtotal, 2); ?></span></li>
+                            </ul>
                         </div>
                         <div class="cart-detail">
                             <h2>Payment Method</h2>

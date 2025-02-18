@@ -1,5 +1,5 @@
 <?php
-include('./link_import.php');
+include('link_import.php');
 session_start();
 
 // Sample cart structure
@@ -8,6 +8,7 @@ if (!isset($_SESSION['cart'])) {
 }
 
 $totalUniqueItems = count($_SESSION['cart']);
+
 ?>
 <nav class="colorlib-nav" role="navigation">
     <div class="top-menu">
@@ -31,23 +32,19 @@ $totalUniqueItems = count($_SESSION['cart']);
                             <button class="btn dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <?php
                                 if (isset($_SESSION['username'])) {
-                                    // Show the username if logged in
                                     echo "Hello, " . htmlspecialchars($_SESSION['username']);
                                 } else {
-                                    // Show "Login" if not logged in
                                     echo "Login / Register";
                                 }
                                 ?>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu dropdown-menu-dark w-100 mw-100" aria-labelledby="navbarDropdown">
                                 <?php
                                 if (isset($_SESSION['username'])) {
-                                    // Display logout option if the user is logged in
                                     echo '<li><a class="dropdown-item roboto-font" href="logout.php">Logout</a></li>';
                                 } else {
-                                    // Display login option if the user is not logged in
                                     echo '<li><a class="dropdown-item" href="login.php">Login</a></li>';
-                                    echo '<li><a class="dropdown-item" href="signup.php">Register New Account</a></li>';
+                                    echo '<li><a class="dropdown-item" href="signup.php">Register</a></li>';
                                 }
                                 ?>
                             </ul>
@@ -75,8 +72,8 @@ $totalUniqueItems = count($_SESSION['cart']);
                             <a href="contact.php">Contact</a>
                         </li>
                         
-                        <!-- Cart -->
-                        <li class="cart <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
+                        <li class="cart ml-3 <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
+                            <a href="order_history.php" class="ml-3 "><i class="bi bi-box-seam"></i> Purchase Items</a>
                             <a href="cart.php"><i class="icon-shopping-cart"></i> Cart [<?= $totalUniqueItems ?>]</a>
                         </li>
                     </ul>
