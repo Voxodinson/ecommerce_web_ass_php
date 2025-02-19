@@ -3,7 +3,7 @@
 <?php include('link_import.php')?>
 <?php
 include_once('services/config.php');
-
+session_start();
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 10;
 $offset = ($page - 1) * $limit;

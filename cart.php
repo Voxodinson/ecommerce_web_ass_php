@@ -5,12 +5,10 @@
 <?php
 session_start();
 
-// Handle quantity update
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id']) && isset($_POST['quantity'])) {
     $product_id = $_POST['product_id'];
     $quantity = $_POST['quantity'];
 
-    // Update quantity in the cart
     foreach ($_SESSION['cart'] as &$item) {
         if ($item['product_id'] == $product_id) {
             $item['quantity'] = $quantity;  
@@ -22,18 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id']) && isset
     exit();
 }
 
-// Handle item removal from cart
 if (isset($_GET['id'])) {
     $product_id = $_GET['id'];
 
     foreach ($_SESSION['cart'] as $key => &$item) {
         if ($item['product_id'] == $product_id) {
             if ($item['quantity'] > 1) {
-                $item['quantity']--;  // Reduce quantity by 1
+                $item['quantity']--;
             } else {
-                unset($_SESSION['cart'][$key]);  // Remove item if quantity is 1
+                unset($_SESSION['cart'][$key]); 
             }
-            break;  // Stop after modifying one item
+            break; 
         }
     }
 
@@ -42,7 +39,6 @@ if (isset($_GET['id'])) {
     exit();
 }
 
-// Calculate total price
 $total = 0;
 foreach ($_SESSION['cart'] as $item) {
     $total += $item['price'] * $item['quantity'];
@@ -85,7 +81,6 @@ foreach ($_SESSION['cart'] as $item) {
                             </div>
                         </div>
 
-                        <!-- Loop through cart items -->
                         <?php if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
                             <?php foreach ($_SESSION['cart'] as $item): ?>
                                 <div class="product-cart d-flex">

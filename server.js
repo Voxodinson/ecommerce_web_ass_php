@@ -35,6 +35,5 @@ app.post('/send-email', async (req, res) => {
         res.status(500).json({ message: 'Failed to send email' });
     }
 });
-
-// Start Server
+å
 app.listen(3000, () => console.log('Server running on port 3000'));

@@ -45,15 +45,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!empty($cartItems)) {
             $order_date = date('Y-m-d H:i:s');
             foreach ($cartItems as $item) {
-                $item_id = $item['product_id'];  // Assuming each item has an 'id' field
+                $item_id = $item['product_id'];
                 $product_name = mysqli_real_escape_string($con, $item['name']);
                 $price = $item['price'];
                 $quantity = $item['quantity'];
                 $subtotal = $price * $quantity;
-                $image = mysqli_real_escape_string($con, $item['image']); // Assuming image is a string URL/path
+                $image = mysqli_real_escape_string($con, $item['image']);
                 
                 
-                // Corrected SQL with 8 columns (including image)
                 $order_sql = "INSERT INTO order_history (checkout_info_id, item_id, product_name, price, quantity, subtotal, order_date, image) 
                               VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -64,7 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     exit();
                 }
 
-                // Correct bind_param with 8 values (including image)
                 $order_stmt->bind_param("iisdddss", $checkout_info_id, $item_id, $product_name, $price, $quantity, $subtotal, $order_date, $image);
 
                 if ($order_stmt->execute()) {
@@ -79,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<script>alert('Your cart is empty. Please add items to the cart before checking out.'); window.location.href='cart.php';</script>";
             exit();
         }
-
+        $_SESSION['cart'] = [];
         echo "<script>window.location.href='order-complete.php'</script>";
     } else {
         echo "<script>alert('Error placing order. Please try again.');</script>";

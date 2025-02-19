@@ -139,7 +139,7 @@
 						<?php
 								$bestSaleCount++;
 								if ($bestSaleCount >= 4) {
-									break; // Stop after displaying 4 products
+									break;
 								}
 							}
 						} else {
