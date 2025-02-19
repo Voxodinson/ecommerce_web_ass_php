@@ -2,7 +2,6 @@
 <?php
 session_start();
 
-// Database connection
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -13,24 +12,21 @@ if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Handle login
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $email = mysqli_real_escape_string($con, $_POST['email']);
     $password = $_POST['password'];
 
-    // Query to fetch user details by email
     $query = "SELECT * FROM users WHERE email = '$email'";
     $result = mysqli_query($con, $query);
 
     if (mysqli_num_rows($result) == 1) {
         $user = mysqli_fetch_assoc($result);
         
-        // Verify password with hashed password from the database
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
-            header("Location: index.php"); // Redirect to dashboard page
+            header("Location: index.php");
             exit();
         } else {
             $error = "Invalid password";
@@ -40,7 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     }
 }
 
-// Handle logout
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: index.php");

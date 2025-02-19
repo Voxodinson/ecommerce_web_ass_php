@@ -71,9 +71,10 @@ $totalUniqueItems = count($_SESSION['cart']);
                         <li class="<?= basename($_SERVER['PHP_SELF']) == 'contact.php' ? 'active' : '' ?>">
                             <a href="contact.php">Contact</a>
                         </li>
-                        
-                        <li class="cart ml-3 <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
+                        <li class="<?= basename($_SERVER['PHP_SELF']) == 'order_history.php' ? 'active' : '' ?>">
                             <a href="order_history.php" class="ml-3 "><i class="bi bi-box-seam"></i> Purchase Items</a>
+                        </li>
+                        <li class="cart ml-3 <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
                             <a href="cart.php"><i class="icon-shopping-cart"></i> Cart [<?= $totalUniqueItems ?>]</a>
                         </li>
                     </ul>
