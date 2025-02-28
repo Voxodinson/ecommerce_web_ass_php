@@ -4,17 +4,14 @@ session_start();
 if (isset($_GET['query'])) {
     $searchTerm = $_GET['query'];
 
-    // Database connection
     $con = mysqli_connect("localhost", "root", "", "ecom_web_assignment");
 
     if (!$con) {
         die("Connection failed: " . mysqli_connect_error());
     }
 
-    // Sanitize input
     $searchTerm = mysqli_real_escape_string($con, $searchTerm);
 
-    // Query to search products and get the first image
     $query = "SELECT id, name, JSON_UNQUOTE(JSON_EXTRACT(images, '$[0]')) AS firstImage, price 
               FROM products_tb 
               WHERE name LIKE '%$searchTerm%' 
@@ -22,12 +19,10 @@ if (isset($_GET['query'])) {
 
     $result = mysqli_query($con, $query);
 
-    // Check for errors in the query
     if (!$result) {
         die("Query failed: " . mysqli_error($con));
     }
 
-    // Display search results
     if (mysqli_num_rows($result) > 0) {
         echo "<ul class='list-group' style='list-style-type: none; padding: 0;'>"; // List container
         while ($row = mysqli_fetch_assoc($result)) {
@@ -40,7 +35,7 @@ if (isset($_GET['query'])) {
                     </a>
                   </li>";
         }
-        echo "</ul>"; // Close the list container
+        echo "</ul>";
     } else {
         echo "<p>No results found.</p>";
     }
