@@ -2,6 +2,7 @@
 <html>
 <?php include('link_import.php')?>
 <?php
+	session_start();
     include_once('services/config.php');
 
     try {
@@ -95,19 +96,11 @@
 		<div class="colorlib-product">
 			<div class="container-fluid">
 				<div class="row">
-					<div class="col-sm-6 text-center">
+					<div class="w-100 text-center">
 						<div class="featured">
-							<a href="men.php" class="featured-img" style="background-image: url(images/men.jpg);"></a>
+							<a href="shop.php" class="featured-img" style="background-image: url(images/men.jpg);"></a>
 							<div class="desc">
-								<h2><a href="men.php">Shop Men's Collection</a></h2>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-6 text-center">
-						<div class="featured">
-							<a href="women.php" class="featured-img" style="background-image: url(images/women.jpg);"></a>
-							<div class="desc">
-								<h2><a href="women.php">Shop Women's Collection</a></h2>
+								<h2><a href="shop.php">Shop Collection</a></h2>
 							</div>
 						</div>
 					</div>
@@ -133,7 +126,6 @@
 								}
 
 								$images = json_decode($row['images'], true);
-								$firstImage = $images[0];
 					?>
 								<div class="col-md-6 col-lg-4 col-xl-3 mb-4">
 									<div class="card h-100 border shadow-sm">
@@ -141,7 +133,8 @@
 											<img 
 												src="<?php echo 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($images[0]); ?>" 
 												class="card-img-top img-fluid" 
-												alt="<?php echo htmlspecialchars($row['name']); ?>">
+												alt="<?php echo htmlspecialchars($row['name']); ?>"
+												style=" height: 250px; object-fit: cover;">
 										</a>
 										<div class="card-body text-center">
 											<h5 class="card-title">

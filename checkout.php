@@ -12,81 +12,75 @@ $username = "root";
 $password = "";
 $database = "ecom_web_assignment";
 
-$con = new mysqli($host, $username, $password, $database);
-if ($con->connect_error) {
-    die("Connection failed: " . $con->connect_error);
+try {
+    $con = new PDO("mysql:host=$host;dbname=$database", $username, $password);
+    // Set the PDO error mode to exception
+    $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+    exit();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = $_SESSION['user_id'];
-    $country = mysqli_real_escape_string($con, $_POST['people']);
-    $fname = mysqli_real_escape_string($con, $_POST['fname']);
-    $lname = mysqli_real_escape_string($con, $_POST['lname']);
-    $address = mysqli_real_escape_string($con, $_POST['address']);
-    $address2 = mysqli_real_escape_string($con, $_POST['address2'] ?? '');
-    $towncity = mysqli_real_escape_string($con, $_POST['towncity']);
-    $stateprovince = mysqli_real_escape_string($con, $_POST['stateprovince'] ?? '');
-    $zippostalcode = mysqli_real_escape_string($con, $_POST['zippostalcode']);
-    $email = mysqli_real_escape_string($con, $_POST['email']);
-    $phone = mysqli_real_escape_string($con, $_POST['phone']);
-    $payment_method = mysqli_real_escape_string($con, $_POST['optradio']);
+    $country = htmlspecialchars($_POST['people']);
+    $fname = htmlspecialchars($_POST['fname']);
+    $lname = htmlspecialchars($_POST['lname']);
+    $address = htmlspecialchars($_POST['address']);
+    $address2 = htmlspecialchars($_POST['address2'] ?? '');
+    $towncity = htmlspecialchars($_POST['towncity']);
+    $stateprovince = htmlspecialchars($_POST['stateprovince'] ?? '');
+    $zippostalcode = htmlspecialchars($_POST['zippostalcode']);
+    $email = htmlspecialchars($_POST['email']);
+    $phone = htmlspecialchars($_POST['phone']);
+    $payment_method = htmlspecialchars($_POST['optradio']);
 
-    $sql = "INSERT INTO checkout_info (user_id, country, fname, lname, address, address2, towncity, stateprovince, zippostalcode, email, phone, payment_method) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    try {
+        $con->beginTransaction();
 
-    $stmt = $con->prepare($sql);
-    $stmt->bind_param("isssssssssss", $user_id, $country, $fname, $lname, $address, $address2, $towncity, $stateprovince, $zippostalcode, $email, $phone, $payment_method);
-
-    if ($stmt->execute()) {
-        $checkout_info_id = $stmt->insert_id;
+        // Insert into checkout_info
+        $sql = "INSERT INTO checkout_info (user_id, country, fname, lname, address, address2, towncity, stateprovince, zippostalcode, email, phone, payment_method) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $con->prepare($sql);
+        $stmt->execute([$user_id, $country, $fname, $lname, $address, $address2, $towncity, $stateprovince, $zippostalcode, $email, $phone, $payment_method]);
         
+        $checkout_info_id = $con->lastInsertId();
+
         $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
         if (!empty($cartItems)) {
             $order_date = date('Y-m-d H:i:s');
             foreach ($cartItems as $item) {
                 $item_id = $item['product_id'];
-                $product_name = mysqli_real_escape_string($con, $item['name']);
+                $product_name = htmlspecialchars($item['name']);
                 $price = $item['price'];
                 $quantity = $item['quantity'];
                 $subtotal = $price * $quantity;
-                $image = mysqli_real_escape_string($con, $item['image']);
-                
-                
+                $image = htmlspecialchars($item['image']);
+
                 $order_sql = "INSERT INTO order_history (checkout_info_id, item_id, product_name, price, quantity, subtotal, order_date, image) 
                               VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
                 $order_stmt = $con->prepare($order_sql);
+                $order_stmt->execute([$checkout_info_id, $item_id, $product_name, $price, $quantity, $subtotal, $order_date, $image]);
 
-                if ($order_stmt === false) {
-                    echo "Error preparing statement: " . $con->error;
-                    exit();
-                }
-
-                $order_stmt->bind_param("iisdddss", $checkout_info_id, $item_id, $product_name, $price, $quantity, $subtotal, $order_date, $image);
-
-                if ($order_stmt->execute()) {
-                    echo "Inserted order history for product: $product_name\n";
-                } else {
-                    echo "Error executing order insert: " . $order_stmt->error . "\n";
-                }
-                $order_stmt->close();
+                echo "Inserted order history for product: $product_name\n";
             }
-            
+
         } else {
             echo "<script>alert('Your cart is empty. Please add items to the cart before checking out.'); window.location.href='cart.php';</script>";
             exit();
         }
+
         $_SESSION['cart'] = [];
+        $con->commit();
         echo "<script>window.location.href='order-complete.php'</script>";
-    } else {
-        echo "<script>alert('Error placing order. Please try again.');</script>";
+    } catch (Exception $e) {
+        $con->rollBack();
+        echo "<script>alert('Error placing order: " . $e->getMessage() . ". Please try again.');</script>";
     }
-    
-    $stmt->close();
 }
 
-$con->close();
+$con = null; // Close the connection
 ?>
 
 
