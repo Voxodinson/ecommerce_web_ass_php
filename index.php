@@ -138,7 +138,10 @@
 								<div class="col-md-6 col-lg-4 col-xl-3 mb-4">
 									<div class="card h-100 border shadow-sm">
 										<a href="product-detail.php?id=<?php echo $row['id']; ?>" class="prod-img">
-											<img src="<?php echo htmlspecialchars($firstImage); ?>" class="card-img-top img-fluid" alt="<?php echo htmlspecialchars($row['name']); ?>">
+											<img 
+												src="<?php echo 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($images[0]); ?>" 
+												class="card-img-top img-fluid" 
+												alt="<?php echo htmlspecialchars($row['name']); ?>">
 										</a>
 										<div class="card-body text-center">
 											<h5 class="card-title">
