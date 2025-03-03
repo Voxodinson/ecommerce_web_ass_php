@@ -4,19 +4,31 @@
 <?php
 include_once('services/config.php');
 session_start();
+
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 10;
 $offset = ($page - 1) * $limit;
 
-$totalQuery = "SELECT COUNT(*) as total FROM products_tb";
-$totalResult = mysqli_query($con, $totalQuery);
-$totalRow = mysqli_fetch_assoc($totalResult);
-$totalProducts = $totalRow['total'];
-$totalPages = ceil($totalProducts / $limit);
+try {
+    // Get total count of products
+    $totalQuery = "SELECT COUNT(*) as total FROM products_tb";
+    $stmt = $con->query($totalQuery);
+    $totalRow = $stmt->fetch(PDO::FETCH_ASSOC);
+    $totalProducts = $totalRow['total'];
+    $totalPages = ceil($totalProducts / $limit);
 
-$query = "SELECT * FROM products_tb LIMIT $limit OFFSET $offset";
-$result = mysqli_query($con, $query);
+    // Fetch paginated products
+    $query = "SELECT * FROM products_tb LIMIT :limit OFFSET :offset";
+    $stmt = $con->prepare($query);
+    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
+}
 ?>
+
 <body>	
 	<div class="colorlib-loader"></div>
 	<div id="page" class=" justify-content-center">

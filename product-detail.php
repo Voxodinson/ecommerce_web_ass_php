@@ -1,4 +1,4 @@
-<?php 
+<?php
 include('link_import.php');
 include_once('services/config.php');
 session_start();
@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
         ";
         exit();
     }
+
     $product_details = getProductDetails($product_id);
     
     if (!$product_details) {
@@ -38,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
     $product_name = $product_details['name'];   
     $product_price = $product_details['price']; 
     $product_description = $product_details['details'];
+    
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
     }
@@ -51,7 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
         }
     }
     
-
     if (!$exists) {
         $cart_item = [
             'product_id' => $product_id,
@@ -64,27 +65,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
         ];
         $_SESSION['cart'][] = $cart_item;
     }
-
+    
     header('Location: ' . $_SERVER['REQUEST_URI']);
     exit();
 }
 
 if ($product_id) {
-    $product_id = mysqli_real_escape_string($con, $product_id);
-    $query = "SELECT * FROM products_tb WHERE id = '$product_id'";
-    $result = mysqli_query($con, $query);
+    try {
+        $query = "SELECT * FROM products_tb WHERE id = :product_id";
+        $stmt = $con->prepare($query);
+        $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $stmt->execute();
 
-    if (mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-
-        // Decode images and sizes from JSON
-        $product_images = json_decode($row['images'], true);
-        $product_name = $row['name'];
-        $product_price = $row['price'];
-        $product_description = $row['details'];
-        $product_sizes = json_decode($row['size'], true);
-    } else {
-        echo "<p>Product not found.</p>";
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            $product_images = json_decode($row['images'], true);
+            $product_name = $row['name'];
+            $product_price = $row['price'];
+            $product_description = $row['details'];
+            $product_sizes = json_decode($row['size'], true);
+        } else {
+            echo "<p>Product not found.</p>";
+        }
+    } catch (PDOException $e) {
+        die("Database error: " . $e->getMessage());
     }
 } else {
     echo "<p>No product ID provided.</p>";
@@ -93,16 +98,23 @@ if ($product_id) {
 // Function to fetch product details by ID
 function getProductDetails($product_id) {
     global $con;
-    $query = "SELECT * FROM products_tb WHERE id = '$product_id'";
-    $result = mysqli_query($con, $query);
-    
-    if (mysqli_num_rows($result) > 0) {
-        return mysqli_fetch_assoc($result);
-    } else {
-        return false;
+    try {
+        $query = "SELECT * FROM products_tb WHERE id = :product_id";
+        $stmt = $con->prepare($query);
+        $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } else {
+            return false;
+        }
+    } catch (PDOException $e) {
+        die("Database error: " . $e->getMessage());
     }
 }
 ?>
+
 
 <!DOCTYPE HTML>
 <html lang="en">
@@ -220,33 +232,42 @@ function getProductDetails($product_id) {
         <?php include('script_import.php'); ?>
 
         <script>
-            $(document).ready(function(){
-                var quantity = 1;
-                $('.quantity-right-plus').click(function(e){
-                    e.preventDefault();
-                    quantity = parseInt($('#quantity').val());
-                    $('#quantity').val(quantity + 1);
-                    $('#quantity_input').val(quantity + 1);
-                });
+            document.addEventListener('DOMContentLoaded', function() {
+            let quantity = 1;
 
-                $('.quantity-left-minus').click(function(e){
-                    e.preventDefault();
-                    quantity = parseInt($('#quantity').val());
-                    if (quantity > 1) {
-                        $('#quantity').val(quantity - 1);
-                        $('#quantity_input').val(quantity - 1);
-                    }
-                });
+            // Increase quantity
+            document.querySelector('.quantity-right-plus').addEventListener('click', function(e) {
+                e.preventDefault();
+                quantity = parseInt(document.getElementById('quantity').value);
+                document.getElementById('quantity').value = quantity + 1;
+                document.getElementById('quantity_input').value = quantity + 1;
             });
 
-            $(document).ready(function() {
-                $('.size-item').click(function() {
-                    $('.size-item').removeClass('active');
-                    $(this).addClass('active');
-                    var selectedSize = $(this).text();  
-                    $('#size_input').val(selectedSize);  
+            // Decrease quantity
+            document.querySelector('.quantity-left-minus').addEventListener('click', function(e) {
+                e.preventDefault();
+                quantity = parseInt(document.getElementById('quantity').value);
+                if (quantity > 1) {
+                    document.getElementById('quantity').value = quantity - 1;
+                    document.getElementById('quantity_input').value = quantity - 1;
+                }
+            });
+
+            // Handle size selection
+            document.querySelectorAll('.size-item').forEach(function(sizeItem) {
+                sizeItem.addEventListener('click', function() {
+                    document.querySelectorAll('.size-item').forEach(function(item) {
+                        item.classList.remove('active');
+                    });
+                    sizeItem.classList.add('active');
+                    var selectedSize = sizeItem.textContent || sizeItem.innerText;
+                    document.getElementById('size_input').value = selectedSize;
                 });
             });
+        });
+
+            
         </script>
+
     </body>
 </html>

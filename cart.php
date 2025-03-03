@@ -80,12 +80,12 @@ foreach ($_SESSION['cart'] as $item) {
                                 <span>Remove</span>
                             </div>
                         </div>
-
+                        
                         <?php if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
                             <?php foreach ($_SESSION['cart'] as $item): ?>
                                 <div class="product-cart d-flex">
 									<div style="width: 53%" class="display-tc d-flex gap-3">
-										<img class="product-img" src="<?php echo htmlspecialchars($item['image']); ?>" alt="Product Image">
+										<img class="product-img" src="<?php echo 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($item['image']); ?>"  alt="Product Image">
 										<div class="d-flex flex-column ml-3">
 											<h5 class=""><?php echo htmlspecialchars($item['name']); ?></h3>
 											<p ><strong>Size:</strong> <?php echo htmlspecialchars($item['size']); ?></p> 

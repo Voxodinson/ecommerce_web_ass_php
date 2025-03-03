@@ -1,46 +1,49 @@
 <?php
-// Start the session
 session_start();
-
-// Include database configuration
 include_once('services/config.php');
 
-// Initialize variables for error messages
 $error = "";
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
-    $username = mysqli_real_escape_string($con, $_POST['username']);
-    $email = mysqli_real_escape_string($con, $_POST['email']);
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    // Validate the inputs
     if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = "All fields are required.";
     } elseif ($password !== $confirm_password) {
         $error = "Passwords do not match.";
     } else {
-        // Check if email already exists
-        $query = "SELECT * FROM users WHERE email = '$email'";
-        $result = mysqli_query($con, $query);
-
-        if (mysqli_num_rows($result) > 0) {
-            $error = "Email already exists.";
-        } else {
-            // Hash the password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-            // Insert user into the database
-            $insert_query = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
-            if (mysqli_query($con, $insert_query)) {
-                $_SESSION['user_id'] = mysqli_insert_id($con);
-                $_SESSION['username'] = $username;
-                header("Location: welcome.php"); // Redirect to a welcome page
-                exit();
+        try {
+            // Check if email already exists
+            $stmt = $con->prepare("SELECT * FROM users WHERE email = :email");
+            $stmt->bindParam(":email", $email);
+            $stmt->execute();
+            
+            if ($stmt->rowCount() > 0) {
+                $error = "Email already exists.";
             } else {
-                $error = "Failed to register. Please try again.";
+                // Hash the password
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                
+                // Insert user into database
+                $insert_stmt = $con->prepare("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)");
+                $insert_stmt->bindParam(":username", $username);
+                $insert_stmt->bindParam(":email", $email);
+                $insert_stmt->bindParam(":password", $hashed_password);
+                
+                if ($insert_stmt->execute()) {
+                    $_SESSION['user_id'] = $con->lastInsertId();
+                    $_SESSION['username'] = $username;
+                    header("Location: welcome.php");
+                    exit();
+                } else {
+                    $error = "Failed to register. Please try again.";
+                }
             }
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
         }
     }
 }

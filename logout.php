@@ -7,20 +7,25 @@ $user = "root";
 $pass = "";
 $dbname = "ecom_web_assignment";
 
-$con = mysqli_connect($host, $user, $pass, $dbname);
-if (!$con) {
-    die("Connection failed: " . mysqli_connect_error());
+try {
+    $con = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
+    $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
-    $email = mysqli_real_escape_string($con, $_POST['email']);
+    $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM users WHERE email = '$email'";
-    $result = mysqli_query($con, $query);
+    // Prepare the SQL query
+    $query = "SELECT * FROM users WHERE email = :email";
+    $stmt = $con->prepare($query);
+    $stmt->bindParam(':email', $email);
+    $stmt->execute();
 
-    if (mysqli_num_rows($result) == 1) {
-        $user = mysqli_fetch_assoc($result);
+    if ($stmt->rowCount() == 1) {
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
@@ -42,6 +47,7 @@ if (isset($_GET['logout'])) {
     exit();
 }
 ?>
+
 <div class="container d-flex flex-column align-items-center justify-content-center vh-100">
     <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
     <p>You are logged in as <strong><?php echo htmlspecialchars($_SESSION['role']); ?></strong>.</p>
