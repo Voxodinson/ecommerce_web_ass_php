@@ -10,7 +10,6 @@ $product_price = '';
 $product_description = '';
 $product_images = [];
 $product_sizes = [];
-$product_widths = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
     $product_id = $_POST['product_id'];
@@ -35,6 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
     }
     
     $product_images = json_decode($product_details['images'], true);
+    if (!is_array($product_images)) {
+        $product_images = [];
+    }
+    
     $product_image = isset($product_images[0]) ? $product_images[0] : ''; 
     $product_name = $product_details['name'];   
     $product_price = $product_details['price']; 
@@ -54,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
     }
     
     if (!$exists) {
-        $cart_item = [
+        $_SESSION['cart'][] = [
             'product_id' => $product_id,
             'quantity' => $quantity,
             'size' => $size,
@@ -63,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
             'image' => $product_image,
             'details' => $product_description
         ];
-        $_SESSION['cart'][] = $cart_item;
     }
     
     header('Location: ' . $_SERVER['REQUEST_URI']);
@@ -71,31 +73,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
 }
 
 if ($product_id) {
-    try {
-        $query = "SELECT * FROM products_tb WHERE id = :product_id";
-        $stmt = $con->prepare($query);
-        $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
-        $stmt->execute();
-
-        if ($stmt->rowCount() > 0) {
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            $product_images = json_decode($row['images'], true);
-            $product_name = $row['name'];
-            $product_price = $row['price'];
-            $product_description = $row['details'];
-            $product_sizes = json_decode($row['size'], true);
-        } else {
-            echo "<p>Product not found.</p>";
+    $product_details = getProductDetails($product_id);
+    if ($product_details) {
+        $product_images = json_decode($product_details['images'], true);
+        if (!is_array($product_images)) {
+            $product_images = [];
         }
-    } catch (PDOException $e) {
-        die("Database error: " . $e->getMessage());
+        $product_name = $product_details['name'];
+        $product_price = $product_details['price'];
+        $product_description = $product_details['details'];
+        $product_sizes = json_decode($product_details['size'], true);
+        if (!is_array($product_sizes)) {
+            $product_sizes = [];
+        }
+    } else {
+        echo "<p>Product not found.</p>";
     }
 } else {
     echo "<p>No product ID provided.</p>";
 }
 
-// Function to fetch product details by ID
 function getProductDetails($product_id) {
     global $con;
     try {
@@ -104,11 +101,7 @@ function getProductDetails($product_id) {
         $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
         $stmt->execute();
 
-        if ($stmt->rowCount() > 0) {
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } else {
-            return false;
-        }
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: false;
     } catch (PDOException $e) {
         die("Database error: " . $e->getMessage());
     }
@@ -143,19 +136,35 @@ function getProductDetails($product_id) {
         <div class="colorlib-product">
             <div class="container">
                 <div class="row row-pb-lg product-detail-wrap">
-                    <div class="col-sm-8">
-                        <div class="owl-carousel">
-                            <?php foreach ($product_images as $image): ?>
-                                <div class="item">
-                                    <div class="product-entry border">
-                                        <a href="#" class="prod-img">
-                                            <img src="<?php echo htmlspecialchars($image); ?>" class="img-fluid" alt="<?php echo htmlspecialchars($product_name); ?>">
-                                        </a>
-                                    </div>
-                                </div>
-                            <?php endforeach;?>
+                <div class="col-sm-8">
+    <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <?php if (!empty($product_images)): ?>
+                <?php foreach ($product_images as $index => $image): ?>
+                    <div class="carousel-item <?php echo ($index == 0) ? 'active' : ''; ?>">
+                        <div class="product-entry border">
+                            <a href="#" class="prod-img">
+                                <img src="<?php echo 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($image); ?>" class="d-block w-100" alt="<?php echo htmlspecialchars($product_name); ?>">
+                            </a>
                         </div>
                     </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>No images available for this product.</p>
+            <?php endif; ?>
+        </div>
+        <!-- Carousel controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
                     <div class="col-sm-4">
                         <div class="product-desc">
                             <h3><?php echo htmlspecialchars($product_name); ?></h3>
@@ -230,7 +239,7 @@ function getProductDetails($product_id) {
         </div>
         <?php include('includes/footer.php'); ?>
         <?php include('script_import.php'); ?>
-
+        
         <script>
             document.addEventListener('DOMContentLoaded', function() {
             let quantity = 1;

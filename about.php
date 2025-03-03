@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-	<?php include('link_import.php')?>
+	<?php 
+		include('link_import.php')?>
 <body>
 	<div class="colorlib-loader"></div>
 	<div id="page">

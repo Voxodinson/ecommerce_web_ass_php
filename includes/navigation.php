@@ -2,7 +2,6 @@
 include('link_import.php');
 session_start();
 
-// Sample cart structure
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
@@ -59,11 +58,8 @@ $totalUniqueItems = count($_SESSION['cart']);
                         <li class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
                             <a href="index.php">Home</a>
                         </li>
-                        <li class="<?= basename($_SERVER['PHP_SELF']) == 'men.php' ? 'active' : '' ?>">
-                            <a href="men.php">Men</a>
-                        </li>
-                        <li class="<?= basename($_SERVER['PHP_SELF']) == 'women.php' ? 'active' : '' ?>">
-                            <a href="women.php">Women</a>
+                        <li class="<?= basename($_SERVER['PHP_SELF']) == 'shop.php' ? 'active' : '' ?>">
+                            <a href="shop.php">Shop</a>
                         </li>
                         <li class="<?= basename($_SERVER['PHP_SELF']) == 'about.php' ? 'active' : '' ?>">
                             <a href="about.php">About</a>

@@ -18,7 +18,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Prepare the SQL query
     $query = "SELECT * FROM users WHERE email = :email";
     $stmt = $con->prepare($query);
     $stmt->bindParam(':email', $email);
