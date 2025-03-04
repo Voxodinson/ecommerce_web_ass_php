@@ -136,34 +136,33 @@ function getProductDetails($product_id) {
         <div class="colorlib-product">
             <div class="container">
                 <div class="row row-pb-lg product-detail-wrap">
-                <div class="col-sm-8">
-    <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            <?php if (!empty($product_images)): ?>
-                <?php foreach ($product_images as $index => $image): ?>
-                    <div class="carousel-item <?php echo ($index == 0) ? 'active' : ''; ?>">
-                        <div class="product-entry border">
-                            <a href="#" class="prod-img">
-                                <img src="<?php echo 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($image); ?>" class="d-block w-100" alt="<?php echo htmlspecialchars($product_name); ?>">
-                            </a>
+                    <div class="col-sm-8">
+                        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <?php if (!empty($product_images)): ?>
+                                    <?php foreach ($product_images as $index => $image): ?>
+                                        <div class="carousel-item <?php echo ($index == 0) ? 'active' : ''; ?>">
+                                            <div class="product-entry border">
+                                                <a href="#" class="prod-img">
+                                                    <img src="<?php echo 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($image); ?>" class="d-block w-100" alt="<?php echo htmlspecialchars($product_name); ?>">
+                                                </a>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p>No images available for this product.</p>
+                                <?php endif; ?>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p>No images available for this product.</p>
-            <?php endif; ?>
-        </div>
-        <!-- Carousel controls -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
-    </div>
-</div>
 
                     <div class="col-sm-4">
                         <div class="product-desc">
