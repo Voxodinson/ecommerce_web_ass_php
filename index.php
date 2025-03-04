@@ -158,7 +158,7 @@
 				</div>
 				<div class="row">
 					<div class="col-md-12 text-center">
-						<p><a href="men.php" class="btn btn-primary btn-lg">Shop All Products</a></p>
+						<p><a href="shop.php" class="btn btn-primary btn-lg">Shop All Products</a></p>
 					</div>
 				</div>
 			</div>
