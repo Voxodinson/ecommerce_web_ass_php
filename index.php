@@ -18,7 +18,6 @@
         die("Database error: " . $e->getMessage());
     }
 ?>
-
 <body>
 
 	<div class="colorlib-loader"></div>

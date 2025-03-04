@@ -43,4 +43,5 @@
     <meta name="twitter:image" content="" />
     <meta name="twitter:url" content="" />
     <meta name="twitter:card" content="" />
+    <link rel="icon" type="image/x-icon" href="images/bot.webp">
 </head>
