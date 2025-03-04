@@ -40,6 +40,8 @@ $totalUniqueItems = count($_SESSION['cart']);
                             <ul class="dropdown-menu dropdown-menu-dark w-100 mw-100" aria-labelledby="navbarDropdown">
                                 <?php
                                 if (isset($_SESSION['username'])) {
+
+                                    echo '<li><a class="dropdown-item roboto-font" href="edit_profile.php">Profile</a></li>';
                                     echo '<li><a class="dropdown-item roboto-font" href="logout.php">Logout</a></li>';
                                 } else {
                                     echo '<li><a class="dropdown-item" href="login.php">Login</a></li>';
