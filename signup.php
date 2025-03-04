@@ -16,7 +16,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
         $error = "Passwords do not match.";
     } else {
         try {
-            // Check if email already exists
             $stmt = $con->prepare("SELECT * FROM users WHERE email = :email");
             $stmt->bindParam(":email", $email);
             $stmt->execute();
@@ -24,10 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
             if ($stmt->rowCount() > 0) {
                 $error = "Email already exists.";
             } else {
-                // Hash the password
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                 
-                // Insert user into database
                 $insert_stmt = $con->prepare("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)");
                 $insert_stmt->bindParam(":username", $username);
                 $insert_stmt->bindParam(":email", $email);
@@ -59,7 +56,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
 </head>
 <body class="d-flex justify-content-center align-items-center vh-100 bg-light">
 
-<!-- Signup Form -->
 <div class="card p-4 shadow-lg" style="width: 400px;">
     <h3 class="text-center">Create an Account</h3>
 

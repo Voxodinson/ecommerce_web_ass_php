@@ -37,7 +37,7 @@
 					   					<h2 class="head-2">Shoes</h2>
 					   					<h2 class="head-3">Collection</h2>
 					   					<p class="category"><span>New trending shoes</span></p>
-					   					<p><a href="men.php" class="btn btn-primary">Shop Collection</a></p>
+					   					<p><a href="shop.php" class="btn btn-primary">Shop Collection</a></p>
 				   					</div>
 				   				</div>
 				   			</div>
@@ -55,7 +55,7 @@
 					   					<h2 class="head-2">Sale</h2>
 					   					<h2 class="head-3"><strong class="font-weight-bold">50%</strong> Off</h2>
 					   					<p class="category"><span>Big sale sandals</span></p>
-					   					<p><a href="women.php" class="btn btn-primary">Shop Collection</a></p>
+					   					<p><a href="shop.php" class="btn btn-primary">Shop Collection</a></p>
 				   					</div>
 				   				</div>
 				   			</div>
@@ -73,7 +73,7 @@
 					   					<h2 class="head-2">Arrival</h2>
 					   					<h2 class="head-3">up to <strong class="font-weight-bold">30%</strong> off</h2>
 					   					<p class="category"><span>New stylish shoes for men</span></p>
-					   					<p><a href="men.php" class="btn btn-primary">Shop Collection</a></p>
+					   					<p><a href="shop.php" class="btn btn-primary">Shop Collection</a></p>
 				   					</div>
 				   				</div>
 				   			</div>
