@@ -4,12 +4,12 @@ include_once('services/config.php');
 session_start();
 
 $product_id = isset($_GET['id']) ? $_GET['id'] : null;
-
 $product_name = '';
 $product_price = '';
 $product_description = '';
 $product_images = [];
 $product_sizes = [];
+$rating = 0.0;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
     $product_id = $_POST['product_id'];
@@ -33,12 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
         exit();
     }
     
-    $product_images = json_decode($product_details['images'], true);
-    if (!is_array($product_images)) {
-        $product_images = [];
-    }
-    
-    $product_image = isset($product_images[0]) ? $product_images[0] : ''; 
+    $product_images = json_decode($product_details['images'], true) ?: [];
+    $product_image = $product_images[0] ?? ''; 
     $product_name = $product_details['name'];   
     $product_price = $product_details['price']; 
     $product_description = $product_details['details'];
@@ -75,17 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
 if ($product_id) {
     $product_details = getProductDetails($product_id);
     if ($product_details) {
-        $product_images = json_decode($product_details['images'], true);
-        if (!is_array($product_images)) {
-            $product_images = [];
-        }
+        $product_images = json_decode($product_details['images'], true) ?: [];
         $product_name = $product_details['name'];
         $product_price = $product_details['price'];
         $product_description = $product_details['details'];
-        $product_sizes = json_decode($product_details['size'], true);
-        if (!is_array($product_sizes)) {
-            $product_sizes = [];
-        }
+        $product_sizes = json_decode($product_details['size'], true) ?: [];
+        $rating = (float) $product_details['rating'];
     } else {
         echo "<p>Product not found.</p>";
     }
@@ -96,18 +87,19 @@ if ($product_id) {
 function getProductDetails($product_id) {
     global $con;
     try {
-        $query = "SELECT * FROM products_tb WHERE id = :product_id";
+        $query = "SELECT name, price, details, images, size, rating FROM products_tb WHERE id = :product_id";
         $stmt = $con->prepare($query);
         $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
         $stmt->execute();
-
+        if ($product) {
+            $product['rating'] = (float) $product['rating'];
+        }
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: false;
     } catch (PDOException $e) {
         die("Database error: " . $e->getMessage());
     }
 }
 ?>
-
 
 <!DOCTYPE HTML>
 <html lang="en">
@@ -117,6 +109,12 @@ function getProductDetails($product_id) {
         .size-item.active {
             background-color: #17a2b8;
             font-weight: bold;
+        }
+        .star {
+            color: gray;
+        }
+        .yellow {
+            color: yellow;
         }
     </style>
 </head>
@@ -144,13 +142,25 @@ function getProductDetails($product_id) {
                                         <div class="carousel-item <?php echo ($index == 0) ? 'active' : ''; ?>">
                                             <div class="product-entry border">
                                                 <a href="#" class="prod-img">
-                                                    <img src="<?php echo 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($image); ?>" class="d-block w-100" alt="<?php echo htmlspecialchars($product_name); ?>">
+                                                    <img 
+                                                        src="<?php echo !empty($image) ? 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($image) : 'images/no_image.jpg'; ?>" 
+                                                        class="d-block w-100" 
+                                                        alt="<?php echo htmlspecialchars($product_name); ?>">
                                                 </a>
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                    <p>No images available for this product.</p>
+                                    <div class="carousel-item active">
+                                        <div class="product-entry border">
+                                            <a href="#" class="prod-img">
+                                                <img 
+                                                    src="images/no_image.jpg" 
+                                                    class="d-block w-100" 
+                                                    alt="No image available">
+                                            </a>
+                                        </div>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                             <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
@@ -171,21 +181,21 @@ function getProductDetails($product_id) {
                                 <span>$<?php echo number_format($product_price, 2); ?></span> 
                                 <span class="rate">
                                     <?php 
-                                    $rating = $row['rating'];  
-                                    $fullStars = floor($rating);
-                                    $halfStar = ($rating - $fullStars >= 0.5) ? 1 : 0;
-                                    $emptyStars = 5 - $fullStars - $halfStar;
-                                    for ($i = 0; $i < $fullStars; $i++) {
-                                        echo '<i class="icon-star-full"></i>';
-                                    }
-                                    if ($halfStar) {
-                                        echo '<i class="icon-star-half"></i>';
-                                    }
-                                    for ($i = 0; $i < $emptyStars; $i++) {
-                                        echo '<i class="icon-star-empty"></i>';
-                                    }
+                                        $fullStars = floor($rating);
+                                        $halfStar = ($rating - $fullStars >= 0.5) ? 1 : 0;
+                                        $emptyStars = 5 - $fullStars - $halfStar;
+                                        
+                                        for ($i = 0; $i < $fullStars; $i++) {
+                                            echo '<i class="icon-star-full" style="color: gold;"></i>';
+                                        }
+                                        if ($halfStar) {
+                                            echo '<i class="icon-star-half" style="color: gold;"></i>';
+                                        }
+                                        for ($i = 0; $i < $emptyStars; $i++) {
+                                            echo '<i class="icon-star-empty star "></i>';
+                                        }
                                     ?>
-                                    (<?php echo $rating; ?> Rating)
+                                    (<?= number_format($rating, 1); ?> Rating)
                                 </span>
                             </p>
 
@@ -241,40 +251,39 @@ function getProductDetails($product_id) {
         
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-            let quantity = 1;
-
-            // Increase quantity
-            document.querySelector('.quantity-right-plus').addEventListener('click', function(e) {
-                e.preventDefault();
-                quantity = parseInt(document.getElementById('quantity').value);
-                document.getElementById('quantity').value = quantity + 1;
-                document.getElementById('quantity_input').value = quantity + 1;
-            });
-
-            // Decrease quantity
-            document.querySelector('.quantity-left-minus').addEventListener('click', function(e) {
-                e.preventDefault();
-                quantity = parseInt(document.getElementById('quantity').value);
-                if (quantity > 1) {
-                    document.getElementById('quantity').value = quantity - 1;
-                    document.getElementById('quantity_input').value = quantity - 1;
-                }
-            });
-
-            // Handle size selection
-            document.querySelectorAll('.size-item').forEach(function(sizeItem) {
-                sizeItem.addEventListener('click', function() {
-                    document.querySelectorAll('.size-item').forEach(function(item) {
-                        item.classList.remove('active');
+                let quantityInput = document.getElementById('quantity');
+                let quantityHiddenInput = document.getElementById('quantity_input');
+                let sizeInput = document.getElementById('size_input');
+        
+                document.querySelectorAll('.quantity-right-plus').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        let quantity = parseInt(quantityInput.value);
+                        quantityInput.value = quantity + 1;
+                        quantityHiddenInput.value = quantity + 1;
                     });
-                    sizeItem.classList.add('active');
-                    var selectedSize = sizeItem.textContent || sizeItem.innerText;
-                    document.getElementById('size_input').value = selectedSize;
+                });
+        
+                document.querySelectorAll('.quantity-left-minus').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        let quantity = parseInt(quantityInput.value);
+                        if (quantity > 1) {
+                            quantityInput.value = quantity - 1;
+                            quantityHiddenInput.value = quantity - 1;
+                        }
+                    });
+                });
+        
+                document.querySelectorAll('.size-item').forEach(function(sizeItem) {
+                    sizeItem.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.querySelectorAll('.size-item').forEach(item => item.classList.remove('active'));
+                        sizeItem.classList.add('active');
+                        sizeInput.value = sizeItem.textContent.trim();
+                    });
                 });
             });
-        });
-
-            
         </script>
 
     </body>

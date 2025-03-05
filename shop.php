@@ -6,18 +6,16 @@ include_once('services/config.php');
 session_start();
 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = 10;
+$limit = 12;
 $offset = ($page - 1) * $limit;
 
 try {
-    // Get total products count
     $totalQuery = "SELECT COUNT(*) as total FROM products_tb";
     $stmt = $con->query($totalQuery);
     $totalRow = $stmt->fetch(PDO::FETCH_ASSOC);
-    $totalProducts = (int) $totalRow['total']; // Ensure it's an integer
+    $totalProducts = (int) $totalRow['total']; 
     $totalPages = ($totalProducts > 0) ? ceil($totalProducts / $limit) : 1;
 
-    // Fetch products with proper binding
     $query = "SELECT * FROM products_tb LIMIT :limit OFFSET :offset";
     $stmt = $con->prepare($query);
     $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
@@ -25,7 +23,6 @@ try {
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Debugging output (remove in production)
     if (empty($products)) {
         echo "No products found.";
     }
@@ -62,24 +59,6 @@ try {
 				</div>
 			</div>
 		</div>
-
-		<div class="colorlib-featured">
-			<div class="container">
-				<div class="row">
-					
-					<div class="w-100 text-center">
-						<div class="featured">
-							<div class="featured-img featured-img-2" style="position: relative; background-image: url(images/item-13.jpg); background-size: cover; background-position: center;">
-								<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6);"></div>
-								<div style="position: relative; z-index: 2; text-align: center; padding: 100px 20px;">
-									<h2 style="color: white; font-size: 1.2rem;">We offer the finest quality shoes, combining style, comfort, and durability. Experience premium craftsmanship with every step!</h2>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
 		<div class="colorlib-featured">
             <div class="container">
                 <div class="row">
@@ -92,13 +71,13 @@ try {
                     if (!empty($products)) {
                         foreach ($products as $row) {
                             $images = json_decode($row['images'], true);
-                            $firstImage = !empty($images) ? htmlspecialchars($images[0]) : 'images/default.jpg';
+                            $firstImage = !empty($images) ? 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($images[0]) : 'images/no_image.jpg';
                     ?>
                             <div class="col-md-3 col-lg-3 col-xl-3 mb-5">
                                 <div class="card h-100 border shadow-sm">
                                     <a href="product-detail.php?id=<?php echo $row['id']; ?>" class="prod-img">
                                         <img 
-											src="<?php echo 'http://localhost/school_ass/ecom_web_admin/uploads/images/' . htmlspecialchars($firstImage); ?>"  
+										    src="<?php echo $firstImage ?>"
 											class="card-img-top img-fluid" 
 											alt="<?php echo htmlspecialchars($row['name']); ?>"
 											style=" height: 250px; object-fit: cover;">
@@ -141,6 +120,23 @@ try {
                 </div> 
             </div>
         </div>
+		<div class="colorlib-featured" style="margin-top: 100px;">
+			<div class="container">
+				<div class="row">
+					
+					<div class="w-100 text-center">
+						<div class="featured">
+							<div class="featured-img featured-img-2" style="position: relative; background-image: url(images/item-13.jpg); background-size: cover; background-position: center;">
+								<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6);"></div>
+								<div style="position: relative; z-index: 2; text-align: center; padding: 100px 20px;">
+									<h2 style="color: white; font-size: 1.2rem;">We offer the finest quality shoes, combining style, comfort, and durability. Experience premium craftsmanship with every step!</h2>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="colorlib-partner">
 			<div class="container">
 				<div class="row">
