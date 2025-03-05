@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html>
 	<?php 
-		include('link_import.php')?>
+		session_start();
+		include('link_import.php')?>?>
 <body>
 	<div class="colorlib-loader"></div>
 	<div id="page">
