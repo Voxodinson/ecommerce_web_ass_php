@@ -23,10 +23,6 @@ try {
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if (empty($products)) {
-        echo "No products found.";
-    }
-
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
 }
@@ -52,14 +48,11 @@ try {
 					<div class="col">
 						<div class="breadcrumbs-img" style="background-image: url(images/cover-img-1.jpg);">
 						</div>
-						<div class="menu text-center">
-							<p><a href="#">New Arrivals</a> <a href="#">Best Sellers</a> <a href="#">Extended Widths</a> <a href="#">Sale</a></p>
-						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="colorlib-featured">
+		<div class="colorlib-featured mt-3">
             <div class="container">
                 <div class="row">
                     <div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
