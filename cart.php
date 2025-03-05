@@ -89,7 +89,6 @@ foreach ($_SESSION['cart'] as $item) {
 										<div class="d-flex flex-column ml-3">
 											<h5 class=""><?php echo htmlspecialchars($item['name']); ?></h3>
 											<p ><strong>Size:</strong> <?php echo htmlspecialchars($item['size']); ?></p> 
-											<p><strong>Details:</strong> <?php echo htmlspecialchars($item['details']); ?></p> 
 										</div>
 									</div>
                                     <div class="one-eight text-center">
